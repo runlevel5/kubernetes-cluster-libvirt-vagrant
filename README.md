@@ -1,12 +1,20 @@
-## Kubernetes Cluster with libvirt/kvm on Linux ppc64le
+## Kubernetes Cluster with libvirt/kvm
 
-Have you just picked up k8s? Struggling to get minikube up running on Linux ppc64le? Well so am I. The support
-for Linux ppc64le is poor in k8s world so I code up a way to bring up a local k8s cluster with 1 master and 2 workers
-with libvirt/kvm. This cluster is intended for learning and local development. DO NOT use for production.
+Have you just picked up k8s? Well firstly you should look into `minikube` if you
+are after a simple one-node cluster for learning.
+
+If you fail to get minikube to work on your machine, you could set up a local
+cluster with libvirt. DO NOT USE it for production.
+
+This cluster consists of 1 master and 2 worker nodes that are configured with:
+
+* CRI: containerd
+* CNI: calico
+* SMI: none
 
 ### Prerequisites
 
-* POWER9-based workstation running Linux ppc64le (for example Raptor CS Blackbird running Fedora 32 PPC64LE)
+* Linux (amd64|ppc64le|arm64)
 * packer
 * vagrant
 * vagrant-libvirt
@@ -16,13 +24,13 @@ with libvirt/kvm. This cluster is intended for learning and local development. D
 1. Build vagrant box:
 
 ```
-cd packer && packer build ubuntu-18.04-ppc64le.json
+cd packer && packer build ubuntu-18.04-k8s-<arch>.json
 ```
 
 2. Add vagrant box:
 
 ```
-vagrant box add --name 'local/ubuntu-1804-k8s' box/ubuntu-1804-ppc64le.box
+vagrant box add --name 'local/ubuntu-1804-k8s' box/ubuntu-1804-<arch>-k8s.box
 ```
 
 3. Orchestrate cluster:
