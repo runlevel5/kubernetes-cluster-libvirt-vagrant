@@ -44,7 +44,7 @@
       "ssh_username": "ubuntu",
       "ssh_wait_timeout": "10000s",
       "type": "qemu",
-      "vm_name": "packer-ubuntu-18.04-ppc64le"
+      "vm_name": "packer-ubuntu-18.04-k8s-ppc64le"
     }
   ],
   "provisioners": [
@@ -64,13 +64,12 @@
     }
   ],
   "variables": {
-    "mirror": "http://cdimage.ubuntu.com",
-    "image_name": "Ubuntu 18.04 LE"
+    "mirror": "http://cdimage.ubuntu.com"
   },
   "post-processors": [
     {
       "keep_input_artifact": true,
-      "output": "box/ubuntu-1804-ppc64le.box",
+      "output": "box/ubuntu-1804-k8s-ppc64le.box",
       "type": "vagrant"
     }
   ]
