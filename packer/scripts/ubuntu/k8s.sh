@@ -8,10 +8,19 @@ apt-get install -y \
     gnupg-agent \
     software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-add-apt-repository \
-   "deb [arch=ppc64el] https://download.docker.com/linux/ubuntu \
-   $(lsb_release -cs) \
-   stable"
+
+if [ $(arch) == "ppc64le" ]; then
+  add-apt-repository \
+    "deb [arch=ppc64el] https://download.docker.com/linux/ubuntu \
+    $(lsb_release -cs) \
+    stable"
+else
+  add-apt-repository \
+    "deb [arch=$(arch)] https://download.docker.com/linux/ubuntu \
+    $(lsb_release -cs) \
+    stable"
+fi
+
 apt-get update
 apt-get install -y containerd.io
 cat > /etc/modules-load.d/containerd.conf <<EOF
@@ -69,4 +78,3 @@ image-endpoint: unix:///run/containerd/containerd.sock
 timeout: 10
 debug: true
 EOF
-
