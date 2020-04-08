@@ -14,6 +14,11 @@ if [ $(arch) == "ppc64le" ]; then
     "deb [arch=ppc64el] https://download.docker.com/linux/ubuntu \
     $(lsb_release -cs) \
     stable"
+elif [ $(arch) == "x86_64" ]; then
+  add-apt-repository \
+    "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+    $(lsb_release -cs) \
+    stable"
 else
   add-apt-repository \
     "deb [arch=$(arch)] https://download.docker.com/linux/ubuntu \
