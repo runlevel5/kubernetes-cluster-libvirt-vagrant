@@ -42,7 +42,7 @@ sed -i '/swap/d' /etc/fstab
 swapoff -a
 
 mkdir -p  /etc/systemd/system/kubelet.service.d/
-$ cat << EOF | sudo tee  /etc/systemd/system/kubelet.service.d/0-containerd.conf
+cat << EOF | sudo tee  /etc/systemd/system/kubelet.service.d/0-containerd.conf
 [Service]
 Environment="KUBELET_EXTRA_ARGS=--container-runtime=remote --runtime-request-timeout=15m --container-runtime-endpoint=unix:///run/containerd/containerd.sock"
 EOF
@@ -56,3 +56,17 @@ iptables -P FORWARD ACCEPT
 
 systemctl enable kubelet
 systemctl start kubelet
+
+# install crictl
+VERSION="v1.17.0"
+wget https://github.com/kubernetes-sigs/cri-tools/releases/download/$VERSION/crictl-$VERSION-linux-$(arch).tar.gz
+sudo tar zxvf crictl-$VERSION-linux-$(arch).tar.gz -C /usr/local/bin
+rm -f crictl-$VERSION-linux-$(arch).tar.gz
+
+cat << EOF | sudo tee  /etc/crictl.yaml
+runtime-endpoint: unix:///run/containerd/containerd.sock
+image-endpoint: unix:///run/containerd/containerd.sock
+timeout: 10
+debug: true
+EOF
+
