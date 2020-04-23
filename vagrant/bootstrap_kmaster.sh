@@ -12,8 +12,12 @@ cp /etc/kubernetes/admin.conf /home/ubuntu/.kube/config
 chown -R ubuntu:ubuntu /home/ubuntu/.kube
 
 # Deploy Calico network
-echo "[TASK 15] Deploy Calico network"
-su - ubuntu -c "kubectl create -f https://docs.projectcalico.org/manifests/calico.yaml"
+#echo "[TASK 15] Deploy Calico network"
+cd /tmp && wget https://docs.projectcalico.org/manifests/calico.yaml
+# issue: https://github.com/projectcalico/calico/issues/3455
+sed -i 's/v3\.13\.3/v3\.12\.1/g' /tmp/calico.yaml
+chown ubuntu:ubuntu /tmp/calico.yaml
+su - ubuntu -c "kubectl create -f /tmp/calico.yaml"
 
 # Generate Cluster join command
 echo "[TASK 16] Generate and save cluster join command to /joincluster.sh"
