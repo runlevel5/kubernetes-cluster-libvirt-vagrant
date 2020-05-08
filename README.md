@@ -8,7 +8,7 @@ cluster with libvirt. DO NOT USE it for production.
 
 This cluster consists of 1 master and 2 worker nodes that are configured with:
 
-* CRI: containerd
+* CRI: CRI-O
 * CNI: calico
 * SMI: none
 
