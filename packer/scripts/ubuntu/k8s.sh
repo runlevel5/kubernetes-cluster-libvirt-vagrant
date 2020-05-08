@@ -47,9 +47,11 @@ mkdir -p /etc/containerd
 containerd config default > /etc/containerd/config.toml
 systemctl start containerd
 
+K8S_VERSION=`curl -sL https://dl.k8s.io/release/stable.txt`
+
 # install kublet
 cd /usr/bin
-wget https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/$(arch)/kubelet
+wget https://dl.k8s.io/release/$(K8S_VERSION)/bin/linux/$(arch)/kubelet
 chmod +x ./kubelet
 
 cat << EOF | tee /lib/systemd/system/kubelet.service
@@ -88,12 +90,12 @@ systemctl start kubelet
 
 # install kubectl
 cd /usr/bin
-wget https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/$(arch)/kubectl
+wget https://dl.k8s.io/release/$(K8S_VERSION)/bin/linux/$(arch)/kubectl
 chmod +x ./kubectl
 
 # install kubeadm
 cd /usr/bin
-wget https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/$(arch)/kubeadm
+wget https://dl.k8s.io/release/$(K8S_VERSION)/bin/linux/$(arch)/kubeadm
 chmod +x ./kubeadm
 
 # disable swap
