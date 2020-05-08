@@ -15,25 +15,13 @@ This cluster consists of 1 master and 2 worker nodes that are configured with:
 ### Prerequisites
 
 * Linux (amd64|ppc64le|arm64)
-* packer
+* qemu
 * vagrant
 * vagrant-libvirt
 
 ### Get started
 
-1. Build vagrant box:
-
-```
-cd packer && packer build ubuntu-18.04-k8s-<arch>.json
-```
-
-2. Add vagrant box:
-
-```
-vagrant box add --name 'local/ubuntu-1804-k8s' box/ubuntu-1804-<arch>-k8s.box
-```
-
-3. Orchestrate cluster:
+1. Orchestrate cluster:
 
 ```
 cd vagrant && vagrant up
