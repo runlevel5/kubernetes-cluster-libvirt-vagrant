@@ -17,9 +17,8 @@ arch = case RUBY_PLATFORM
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "open-power/debian-ppc64le"
   config.vm.box_version = "10.3"
-
-  config.ssh.username = "ubuntu"
-  config.ssh.password = "ubuntu"
+  config.ssh.username = "vagrant"
+  config.ssh.password = "vagrant"
   config.vm.provision "shell", path: "bootstrap.sh"
   config.vm.synced_folder '.', '/vagrant', disabled: true
 
