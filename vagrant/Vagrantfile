@@ -4,10 +4,23 @@
 Vagrant.require_plugin "vagrant-libvirt"
 
 ENV['VAGRANT_NO_PARALLEL'] = 'yes'
+
 VAGRANTFILE_API_VERSION = "2"
 
+arch = case RUBY_PLATFORM
+       when /powerpc64le/
+         "ppc64le"
+       when /aarch64/
+         "aarch64"
+       when "x86_64"
+         "amd64"
+       else
+         raise "Your platform is not supported"
+       end
+
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = "local/ubuntu-1804-k8s"
+  config.vm.box = "open-power/kubernetes"
+  config.vm.box_version = "1.18.2-ubuntu-18.04-#{arch}"
 
   config.ssh.username = "ubuntu"
   config.ssh.password = "ubuntu"
