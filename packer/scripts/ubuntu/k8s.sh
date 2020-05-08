@@ -48,17 +48,20 @@ containerd config default > /etc/containerd/config.toml
 systemctl start containerd
 
 # install kublet
-cd /usr/local/bin
+cd /usr/bin
 wget https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/$(arch)/kubelet
 chmod +x ./kubelet
 
 cat << EOF | tee /lib/systemd/system/kubelet.service
 [Unit]
 Description=kubelet: The Kubernetes Node Agent
-Documentation=https://kubernetes.io/docs/home/
+Documentation=https://kubernetes.io/docs/
+Wants=network-online.target
+After=network-online.target
 
 [Service]
-ExecStart=/usr/local/bin/kubelet
+EnvironmentFile=-/etc/default/kubelet
+ExecStart=/usr/bin/kubelet $KUBELET_EXTRA_ARGS
 Restart=always
 StartLimitInterval=0
 RestartSec=10
@@ -67,25 +70,10 @@ RestartSec=10
 WantedBy=multi-user.target
 EOF
 
-# install kubectl
-cd /usr/local/bin
-wget https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/$(arch)/kubectl
-chmod +x ./kubectl
-
-# install kubeadm
-cd /usr/local/bin
-wget https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/$(arch)/kubeadm
-chmod +x ./kubeadm
-
-# disable swap
-sed -i '/swap/d' /etc/fstab
-swapoff -a
-
 # configure kubelet to use containerd as CRI plugin
-mkdir -p  /etc/systemd/system/kubelet.service.d/
-cat << EOF | tee /etc/systemd/system/kubelet.service.d/0-containerd.conf
-[Service]
-Environment="KUBELET_EXTRA_ARGS=--container-runtime=remote --runtime-request-timeout=15m --container-runtime-endpoint=unix:///run/containerd/containerd.sock"
+mkdir -p  /etc/default
+cat << EOF | tee /etc/default/kubelet
+KUBELET_EXTRA_ARGS="--container-runtime=remote --runtime-request-timeout=15m --container-runtime-endpoint=unix:///run/containerd/containerd.sock"
 EOF
 
 systemctl daemon-reload
@@ -98,10 +86,24 @@ iptables -P FORWARD ACCEPT
 systemctl enable kubelet
 systemctl start kubelet
 
+# install kubectl
+cd /usr/bin
+wget https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/$(arch)/kubectl
+chmod +x ./kubectl
+
+# install kubeadm
+cd /usr/bin
+wget https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/$(arch)/kubeadm
+chmod +x ./kubeadm
+
+# disable swap
+sed -i '/swap/d' /etc/fstab
+swapoff -a
+
 # install crictl
-VERSION="v1.17.0"
+VERSION="v1.18.0"
 wget https://github.com/kubernetes-sigs/cri-tools/releases/download/$VERSION/crictl-$VERSION-linux-$(arch).tar.gz
-tar zxvf crictl-$VERSION-linux-$(arch).tar.gz -C /usr/local/bin
+tar zxvf crictl-$VERSION-linux-$(arch).tar.gz -C /usr/bin
 rm -f crictl-$VERSION-linux-$(arch).tar.gz
 
 cat << EOF | tee  /etc/crictl.yaml
