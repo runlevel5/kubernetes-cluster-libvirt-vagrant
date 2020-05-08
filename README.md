@@ -1,4 +1,4 @@
-## Kubernetes Cluster with libvirt/kvm
+## Kubernetes Cluster with libvirt/kvm for OpenPOWER
 
 Have you just picked up k8s? Well firstly you should look into `minikube` if you
 are after a simple one-node cluster for learning.
@@ -8,13 +8,14 @@ cluster with libvirt. DO NOT USE it for production.
 
 This cluster consists of 1 master and 2 worker nodes that are configured with:
 
+* Guest OS: Debian 10
 * CRI: CRI-O
 * CNI: calico
 * SMI: none
 
 ### Prerequisites
 
-* Linux (amd64|ppc64le|arm64)
+* Linux ppc64le
 * qemu
 * vagrant
 * vagrant-libvirt
