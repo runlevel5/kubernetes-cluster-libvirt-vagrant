@@ -3,6 +3,7 @@ set -e
 
 # Initialize Kubernetes
 echo "[TASK 13] Initialize Kubernetes Cluster"
+apt-get install conntrack socat
 kubeadm init --cri-socket /run/containerd/containerd.sock --apiserver-advertise-address=172.42.42.100 --pod-network-cidr=192.168.0.0/16 >> /root/kubeinit.log 
 
 # Copy Kube admin config
