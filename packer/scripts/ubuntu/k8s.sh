@@ -50,27 +50,14 @@ systemctl start containerd
 K8S_VERSION=`curl -sL https://dl.k8s.io/release/stable.txt`
 
 # install kublet
-cd /usr/bin
-wget https://dl.k8s.io/release/$(K8S_VERSION)/bin/linux/$(arch)/kubelet
-chmod +x ./kubelet
+cd /tmp
+wget -sL https://github.com/runlevel5/kubernetes-packages/releases/download/$(K8S_VERSION)/kubernetes-cni_0.7.5-0_ubuntu_18.04_$(arch).deb
+dpkg -i kubernetes-cni_0.7.5-0_ubuntu_18.04_$(arch).deb
 
-cat << EOF | tee /lib/systemd/system/kubelet.service
-[Unit]
-Description=kubelet: The Kubernetes Node Agent
-Documentation=https://kubernetes.io/docs/
-Wants=network-online.target
-After=network-online.target
-
-[Service]
-EnvironmentFile=-/etc/default/kubelet
-ExecStart=/usr/bin/kubelet $KUBELET_EXTRA_ARGS
-Restart=always
-StartLimitInterval=0
-RestartSec=10
-
-[Install]
-WantedBy=multi-user.target
-EOF
+apt-get install -y socat iproute2 ebtables ethtool conntrack
+cd /tmp
+wget -sL https://github.com/runlevel5/kubernetes-packages/releases/download/$(K8S_VERSION)/kubelet_1.18.2-0_ubuntu_18.04_$(arch).deb
+dpkg -i kubelet_1.18.2-0_ubuntu_18.04_$(arch).deb
 
 # configure kubelet to use containerd as CRI plugin
 mkdir -p  /etc/default
@@ -78,35 +65,24 @@ cat << EOF | tee /etc/default/kubelet
 KUBELET_EXTRA_ARGS="--container-runtime=remote --runtime-request-timeout=15m --container-runtime-endpoint=unix:///run/containerd/containerd.sock"
 EOF
 
-systemctl daemon-reload
-systemctl restart containerd
-
 # Prevent conflicts between docker iptables (packet filtering) rules and k8s pod communication
 # See https://github.com/kubernetes/kubernetes/issues/40182 for further details.
 iptables -P FORWARD ACCEPT
 
-systemctl enable kubelet
-systemctl start kubelet
-
 # install kubectl
-cd /usr/bin
-wget https://dl.k8s.io/release/$(K8S_VERSION)/bin/linux/$(arch)/kubectl
-chmod +x ./kubectl
+cd /tmp
+wget -sL https://github.com/runlevel5/kubernetes-packages/releases/download/$(K8S_VERSION)/kubectl_1.18.2-0_ubuntu_18.04_$(arch).deb
+dpkg -i kubectl_1.18.2-0_ubuntu_18.04_$(arch).deb
 
 # install kubeadm
-cd /usr/bin
-wget https://dl.k8s.io/release/$(K8S_VERSION)/bin/linux/$(arch)/kubeadm
-chmod +x ./kubeadm
-
-# disable swap
-sed -i '/swap/d' /etc/fstab
-swapoff -a
+cd /tmp
+wget -sL https://github.com/runlevel5/kubernetes-packages/releases/download/$(K8S_VERSION)/kubeadm_1.18.2-0_ubuntu_18.04_$(arch).deb
+dpkg -i kubeadm_1.18.2-0_ubuntu_18.04_$(arch).deb
 
 # install crictl
-VERSION="v1.18.0"
-wget https://github.com/kubernetes-sigs/cri-tools/releases/download/$VERSION/crictl-$VERSION-linux-$(arch).tar.gz
-tar zxvf crictl-$VERSION-linux-$(arch).tar.gz -C /usr/bin
-rm -f crictl-$VERSION-linux-$(arch).tar.gz
+cd /tmp
+wget -sL https://github.com/runlevel5/kubernetes-packages/releases/download/$(K8S_VERSION)/cri-tools_1.18.0-0_ubuntu_18.04_$(arch).deb
+dpkg -i cri-tools_1.18.0-0_ubuntu_18.04_$(arch).deb
 
 cat << EOF | tee  /etc/crictl.yaml
 runtime-endpoint: unix:///run/containerd/containerd.sock
@@ -114,3 +90,14 @@ image-endpoint: unix:///run/containerd/containerd.sock
 timeout: 10
 debug: true
 EOF
+
+
+# clean up
+rm /tmp/*.deb
+
+systemctl enable kubelet
+systemctl start kubelet
+
+# disable swap
+sed -i '/swap/d' /etc/fstab
+swapoff -a
