@@ -10,20 +10,15 @@ VAGRANTFILE_API_VERSION = "2"
 arch = case RUBY_PLATFORM
        when /powerpc64le/
          "ppc64le"
-       when /aarch64/
-         "aarch64"
-       when "x86_64"
-         "amd64"
        else
-         raise "Your platform is not supported"
+         raise "Your platform is not supported (YET)"
        end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = "open-power/kubernetes"
-  config.vm.box_version = "1.18.2-ubuntu-18.04-#{arch}"
-
-  config.ssh.username = "ubuntu"
-  config.ssh.password = "ubuntu"
+  config.vm.box = "open-power/ubuntu-#{arch}"
+  config.vm.box_version = "18.04"
+  config.ssh.username = "vagrant"
+  config.ssh.password = "vagrant"
   config.vm.provision "shell", path: "bootstrap.sh"
   config.vm.synced_folder '.', '/vagrant', disabled: true
 

@@ -9,7 +9,7 @@ cluster with libvirt. DO NOT USE it for production.
 This cluster consists of 1 master and 2 worker nodes that are configured with:
 
 * CRI: containerd
-* CNI: calico
+* CNI: flannel
 * SMI: none
 
 ### Prerequisites

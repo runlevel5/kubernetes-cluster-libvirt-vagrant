@@ -2,25 +2,28 @@
 set -e
 
 # Initialize Kubernetes
-echo "[TASK 13] Initialize Kubernetes Cluster"
-apt-get install conntrack socat
-kubeadm init --cri-socket /run/containerd/containerd.sock --apiserver-advertise-address=172.42.42.100 --pod-network-cidr=192.168.0.0/16 >> /root/kubeinit.log 
+echo "Initialize Kubernetes Cluster"
+kubeadm config images pull
+kubeadm init --cri-socket /run/containerd/containerd.sock --apiserver-advertise-address=172.42.42.100 --pod-network-cidr=192.168.0.0/16 --v=5
 
 # Copy Kube admin config
-echo "[TASK 14] Copy kube admin config to user .kube directory"
-mkdir /home/ubuntu/.kube
-cp /etc/kubernetes/admin.conf /home/ubuntu/.kube/config
-chown -R ubuntu:ubuntu /home/ubuntu/.kube
+echo "Copy kube admin config to user .kube directory"
 
-# Deploy Calico network
-#echo "[TASK 15] Deploy Calico network"
-cd /tmp && wget https://docs.projectcalico.org/manifests/calico.yaml
-# issue: https://github.com/projectcalico/calico/issues/3455
-sed -i 's/v3\.13\.3/v3\.12\.1/g' /tmp/calico.yaml
-chown ubuntu:ubuntu /tmp/calico.yaml
-su - ubuntu -c "kubectl create -f /tmp/calico.yaml"
+# for root user
+mkdir -p $HOME/.kube
+cp -i /etc/kubernetes/admin.conf $HOME/.kube/config 
+chown $(id -u):$(id -g) $HOME/.kube/config
+
+# for vagrant user
+mkdir -p /home/vagrant/.kube
+cp -i /etc/kubernetes/admin.conf /home/vagrant/.kube/config
+chown -R vagrant:vagrant /home/vagrant/.kube
+
+# Deploy flannel network
+echo "Deploy flannel"
+kubectl apply -f https://github.com/coreos/flannel/raw/master/Documentation/kube-flannel.yml
 
 # Generate Cluster join command
-echo "[TASK 16] Generate and save cluster join command to /joincluster.sh"
-kubeadm token create --print-join-command > /home/ubuntu/join_cluster.sh
-chown ubuntu:ubuntu /home/ubuntu/join_cluster.sh
+echo "Generate and save cluster join command to /join_cluster.sh"
+kubeadm token create --print-join-command > /home/vagrant/join_cluster.sh
+chown vagrant:vagrant /home/vagrant/join_cluster.sh
