@@ -15,8 +15,8 @@ arch = case RUBY_PLATFORM
        end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = "open-power/ubuntu-#{arch}"
-  config.vm.box_version = "18.04"
+  config.vm.box = "open-power/debian-#{arch}"
+  config.vm.box_version = "10.4"
   config.ssh.username = "vagrant"
   config.ssh.password = "vagrant"
   config.vm.provision "shell", path: "bootstrap.sh"
@@ -37,7 +37,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       v.cpus = 2
       v.video_type = "vga"
     end
-    kmaster.vm.provision "shell", path: "bootstrap_kmaster.sh"
+    #kmaster.vm.provision "shell", path: "bootstrap_kmaster.sh"
   end
 
   NodeCount = 2
@@ -53,7 +53,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         v.qemu_use_session = false
         v.uri = "qemu:///system"
         v.host = "kworker#{i}"
-        v.memory = 2048
+        v.memory = 4096
         v.cpus = 2
         v.video_type = "vga"
       end
