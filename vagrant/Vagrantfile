@@ -7,16 +7,14 @@ ENV['VAGRANT_NO_PARALLEL'] = 'yes'
 
 VAGRANTFILE_API_VERSION = "2"
 
-arch = case RUBY_PLATFORM
-       when /powerpc64le/
-         "ppc64le"
-       else
-         raise "Your platform is not supported (YET)"
-       end
-
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = "open-power/ubuntu-#{arch}"
-  config.vm.box_version = "18.04"
+  case RUBY_PLATFORM
+  when /powerpc64le/
+    config.vm.box = "open-power/ubuntu-ppc64le"
+    config.vm.box_version = "18.04"
+  else
+    config.vm.box = "ubuntu/bionic64"
+  end
   config.ssh.username = "vagrant"
   config.ssh.password = "vagrant"
   config.vm.provision "shell", path: "bootstrap.sh"
