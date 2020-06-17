@@ -35,6 +35,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       v.cpus = 2
       v.video_type = "vga"
     end
+    kmaster.vm.provision "file", source: "calico.yaml", destination: "/home/vagrant/calico.yaml"
     kmaster.vm.provision "shell", path: "bootstrap_kmaster.sh"
   end
 

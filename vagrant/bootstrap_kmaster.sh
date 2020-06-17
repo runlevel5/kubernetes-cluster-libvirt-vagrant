@@ -20,7 +20,7 @@ cp -i /etc/kubernetes/admin.conf /home/vagrant/.kube/config
 chown -R vagrant:vagrant /home/vagrant/.kube
 
 echo "Deploy Calico CNI"
-kubectl create -f https://docs.projectcalico.org/manifests/calico.yaml
+kubectl create -f /home/vagrant/calico.yaml
 
 # Generate Cluster join command
 echo "Generate and save cluster join command to /join_cluster.sh"
