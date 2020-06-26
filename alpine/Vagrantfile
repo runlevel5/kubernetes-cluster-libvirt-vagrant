@@ -1,6 +1,8 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+# NOTE: Please make sure Vagrant >= 2.2.9
+
 Vagrant.require_plugin "vagrant-libvirt"
 
 ENV['VAGRANT_NO_PARALLEL'] = 'yes'
