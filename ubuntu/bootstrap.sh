@@ -24,13 +24,13 @@ mkdir -p /etc/containerd
 containerd config default > /etc/containerd/config.toml
 systemctl start containerd
 
-export K8S_VERSION="1.18.2"
+export K8S_VERSION="1.18.5"
 export DOWNLOAD_URL="https://github.com/runlevel5/kubernetes-packages/releases/download/v$K8S_VERSION"
 
 # install kublet
 cd /tmp
-wget "$DOWNLOAD_URL/kubernetes-cni_0.7.5-0_ubuntu_18.04_$(arch).deb"
-dpkg -i kubernetes-cni_0.7.5-0_ubuntu_18.04_$(arch).deb
+wget "$DOWNLOAD_URL/kubernetes-cni_0.8.6-0_ubuntu_18.04_$(arch).deb"
+dpkg -i kubernetes-cni_0.8.6-0_ubuntu_18.04_$(arch).deb
 
 apt-get install -y socat iproute2 ebtables ethtool conntrack
 cd /tmp
