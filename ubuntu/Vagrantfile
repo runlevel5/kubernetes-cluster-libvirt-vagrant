@@ -13,7 +13,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.box = "open-power/ubuntu-ppc64le"
     config.vm.box_version = "18.04"
   else
-    config.vm.box = "ubuntu/bionic64"
+    # Build your own vagrant box with https://github.com/runlevel5/vagrant-boxes-ppc64le
+    # make sure you name the vagrant box local/ubuntu64
+    config.vm.box = "local/ubuntu64"
   end
   config.ssh.username = "vagrant"
   config.ssh.password = "vagrant"
