@@ -22,6 +22,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision "shell", path: "bootstrap.sh"
   config.vm.synced_folder '.', '/vagrant', disabled: true
 
+  NODE_COUNT = 2
+
+  $script = %Q{echo "172.42.42.100 kmaster.example.com kmaster" >> /etc/hosts}
+
+  (1..NODE_COUNT).each do |i|
+    $script += %Q{\necho "172.42.42.10#{i} kworker#{i}.example.com kworker#{i}" >> /etc/hosts}
+  end
+
   # Kubernetes Master Server
   config.vm.define "kmaster" do |kmaster|
     kmaster.vm.hostname = "kmaster"
@@ -39,12 +47,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
     kmaster.vm.provision "file", source: "calico.yaml", destination: "/home/vagrant/calico.yaml"
     kmaster.vm.provision "shell", path: "bootstrap_kmaster.sh"
+    kmaster.vm.provision "shell", inline: $script
   end
 
-  NodeCount = 2
-
   # Kubernetes Worker Nodes
-  (1..NodeCount).each do |i|
+  (1..NODE_COUNT).each do |i|
     config.vm.define "kworker#{i}" do |workernode|
       workernode.vm.hostname = "kworker#{i}"
       workernode.vm.network :private_network,
@@ -58,6 +65,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         v.cpus = 2
         v.video_type = "vga"
       end
+      workernode.vm.provision "shell", inline: $script
       workernode.vm.provision "shell", path: "bootstrap_kworker.sh"
     end
   end
