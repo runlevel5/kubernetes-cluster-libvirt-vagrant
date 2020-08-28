@@ -24,7 +24,7 @@ This cluster consists of 1 master and 2 worker nodes that are configured with:
 1. Orchestrate cluster:
 
 ```
-cd vagrant && vagrant up
+cd [alpine|ubuntu] && vagrant up
 ```
 
 4. Verify that you could ssh into either master or worker:

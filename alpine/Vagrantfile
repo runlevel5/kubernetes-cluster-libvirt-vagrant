@@ -1,0 +1,63 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# NOTE: Please make sure Vagrant >= 2.2.9
+
+Vagrant.require_plugin "vagrant-libvirt"
+
+ENV['VAGRANT_NO_PARALLEL'] = 'yes'
+
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  case RUBY_PLATFORM
+  when /powerpc64le/
+    config.vm.box = "open-power/alpine-3.12-ppc64le"
+    config.vm.box_version = "3.12.0"
+  else
+    config.vm.box = "alpine-linux/x86_64"
+    config.vm.box_version = "3.12.0"
+  end
+  config.ssh.username = "vagrant"
+  config.ssh.password = "vagrant"
+  config.vm.provision "shell", path: "bootstrap.sh"
+  config.vm.synced_folder '.', '/vagrant', disabled: true
+
+  config.vm.define "kmaster" do |kmaster|
+    kmaster.vm.hostname = "kmaster"
+    kmaster.vm.network :private_network,
+      ip: "172.42.42.100"
+    kmaster.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
+
+    kmaster.vm.provider :libvirt do |v|
+      v.qemu_use_session = false
+      v.uri = "qemu:///system"
+      v.host = "kmaster"
+      v.memory = 2048
+      v.cpus = 2
+      v.video_type = "vga"
+    end
+    kmaster.vm.provision "shell", path: "bootstrap_kmaster.sh"
+  end
+
+  NODE_COUNT = 2
+
+  # Kubernetes Worker Nodes
+  (1..NODE_COUNT).each do |i|
+    config.vm.define "kworker#{i}" do |workernode|
+      workernode.vm.hostname = "kworker#{i}"
+      workernode.vm.network :private_network,
+        ip: "172.42.42.10#{i}"
+      workernode.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
+      workernode.vm.provider :libvirt do |v|
+        v.qemu_use_session = false
+        v.uri = "qemu:///system"
+        v.host = "kworker#{i}"
+        v.memory = 2048
+        v.cpus = 2
+        v.video_type = "vga"
+      end
+      workernode.vm.provision "shell", path: "bootstrap_kworker.sh"
+    end
+  end
+end
