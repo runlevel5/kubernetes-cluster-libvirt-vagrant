@@ -13,6 +13,12 @@ EOF
 modprobe overlay
 modprobe br_netfilter
 
+if [[ "$(arch)" == "x86_64" ]]; then
+  ARCH="amd64"
+else
+  ARCH="$(arch)"
+fi
+
 # Setup required sysctl params, these persist across reboots.
 cat > /etc/sysctl.d/99-kubernetes-cri.conf <<EOF
 net.bridge.bridge-nf-call-iptables  = 1
@@ -29,13 +35,13 @@ export DOWNLOAD_URL="https://github.com/runlevel5/kubernetes-packages/releases/d
 
 # install kublet
 cd /tmp
-wget "$DOWNLOAD_URL/kubernetes-cni_0.8.6-0_$(arch).deb"
-dpkg -i kubernetes-cni_0.8.6-0_$(arch).deb
+wget "$DOWNLOAD_URL/kubernetes-cni_0.8.6-0_$ARCH.deb"
+dpkg -i kubernetes-cni_0.8.6-0_$ARCH.deb
 
 apt-get install -y socat iproute2 ebtables ethtool conntrack
 cd /tmp
-wget "$DOWNLOAD_URL/kubelet_$K8S_VERSION-0_$(arch).deb"
-dpkg -i kubelet_$K8S_VERSION-0_$(arch).deb
+wget "$DOWNLOAD_URL/kubelet_$K8S_VERSION-0_$ARCH.deb"
+dpkg -i kubelet_$K8S_VERSION-0_$ARCH.deb
 
 # configure kubelet to use containerd as CRI plugin
 cat << EOF | tee /etc/default/kubelet
@@ -60,13 +66,13 @@ iptables -P FORWARD ACCEPT
 
 # install kubectl
 cd /tmp
-wget "$DOWNLOAD_URL/kubectl_$K8S_VERSION-0_$(arch).deb"
-dpkg -i kubectl_$K8S_VERSION-0_$(arch).deb
+wget "$DOWNLOAD_URL/kubectl_$K8S_VERSION-0_$ARCH.deb"
+dpkg -i kubectl_$K8S_VERSION-0_$ARCH.deb
 
 # install crictl
 cd /tmp
-wget "$DOWNLOAD_URL/cri-tools_$K8S_VERSION-0_$(arch).deb"
-dpkg -i cri-tools_$K8S_VERSION-0_$(arch).deb
+wget "$DOWNLOAD_URL/cri-tools_$K8S_VERSION-0_$ARCH.deb"
+dpkg -i cri-tools_$K8S_VERSION-0_$ARCH.deb
 
 cat << EOF | tee  /etc/crictl.yaml
 runtime-endpoint: unix:///run/containerd/containerd.sock
@@ -77,8 +83,8 @@ EOF
 
 # install kubeadm
 cd /tmp
-wget "$DOWNLOAD_URL/kubeadm_$K8S_VERSION-0_$(arch).deb"
-dpkg -i kubeadm_$K8S_VERSION-0_$(arch).deb
+wget "$DOWNLOAD_URL/kubeadm_$K8S_VERSION-0_$ARCH.deb"
+dpkg -i kubeadm_$K8S_VERSION-0_$ARCH.deb
 
 # clean up
 rm /tmp/*.deb
