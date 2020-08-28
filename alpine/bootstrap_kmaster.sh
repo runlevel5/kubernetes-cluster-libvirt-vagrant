@@ -34,8 +34,8 @@ mkdir -p /home/vagrant/.kube
 cp -i /etc/kubernetes/admin.conf /home/vagrant/.kube/config
 chown -R vagrant:vagrant /home/vagrant/.kube
 
-echo "Deploy Calico CNI"
-kubectl create -f /home/vagrant/calico.yaml
+echo "Deploy Flannel CNI"
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 
 # Generate Cluster join command
 echo "Generate and save cluster join command to /join_cluster.sh"
