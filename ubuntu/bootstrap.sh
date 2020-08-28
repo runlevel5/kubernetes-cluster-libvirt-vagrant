@@ -24,18 +24,18 @@ mkdir -p /etc/containerd
 containerd config default > /etc/containerd/config.toml
 systemctl start containerd
 
-export K8S_VERSION="1.18.5"
+export K8S_VERSION="1.19.0"
 export DOWNLOAD_URL="https://github.com/runlevel5/kubernetes-packages/releases/download/v$K8S_VERSION"
 
 # install kublet
 cd /tmp
-wget "$DOWNLOAD_URL/kubernetes-cni_0.8.6-0_ubuntu_18.04_$(arch).deb"
-dpkg -i kubernetes-cni_0.8.6-0_ubuntu_18.04_$(arch).deb
+wget "$DOWNLOAD_URL/kubernetes-cni_0.8.6-0_$(arch).deb"
+dpkg -i kubernetes-cni_0.8.6-0_$(arch).deb
 
 apt-get install -y socat iproute2 ebtables ethtool conntrack
 cd /tmp
-wget "$DOWNLOAD_URL/kubelet_$K8S_VERSION-0_ubuntu_18.04_$(arch).deb"
-dpkg -i kubelet_$K8S_VERSION-0_ubuntu_18.04_$(arch).deb
+wget "$DOWNLOAD_URL/kubelet_$K8S_VERSION-0_$(arch).deb"
+dpkg -i kubelet_$K8S_VERSION-0_$(arch).deb
 
 # configure kubelet to use containerd as CRI plugin
 cat << EOF | tee /etc/default/kubelet
@@ -60,13 +60,13 @@ iptables -P FORWARD ACCEPT
 
 # install kubectl
 cd /tmp
-wget "$DOWNLOAD_URL/kubectl_$K8S_VERSION-0_ubuntu_18.04_$(arch).deb"
-dpkg -i kubectl_$K8S_VERSION-0_ubuntu_18.04_$(arch).deb
+wget "$DOWNLOAD_URL/kubectl_$K8S_VERSION-0_$(arch).deb"
+dpkg -i kubectl_$K8S_VERSION-0_$(arch).deb
 
 # install crictl
 cd /tmp
-wget "$DOWNLOAD_URL/cri-tools_1.18.0-0_ubuntu_18.04_$(arch).deb"
-dpkg -i cri-tools_1.18.0-0_ubuntu_18.04_$(arch).deb
+wget "$DOWNLOAD_URL/cri-tools_$K8S_VERSION-0_$(arch).deb"
+dpkg -i cri-tools_$K8S_VERSION-0_$(arch).deb
 
 cat << EOF | tee  /etc/crictl.yaml
 runtime-endpoint: unix:///run/containerd/containerd.sock
@@ -77,8 +77,8 @@ EOF
 
 # install kubeadm
 cd /tmp
-wget "$DOWNLOAD_URL/kubeadm_$K8S_VERSION-0_ubuntu_18.04_$(arch).deb"
-dpkg -i kubeadm_$K8S_VERSION-0_ubuntu_18.04_$(arch).deb
+wget "$DOWNLOAD_URL/kubeadm_$K8S_VERSION-0_$(arch).deb"
+dpkg -i kubeadm_$K8S_VERSION-0_$(arch).deb
 
 # clean up
 rm /tmp/*.deb
