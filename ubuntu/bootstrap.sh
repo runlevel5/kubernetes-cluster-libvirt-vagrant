@@ -13,11 +13,18 @@ EOF
 modprobe overlay
 modprobe br_netfilter
 
-if [[ "$(arch)" == "x86_64" ]]; then
-  ARCH="amd64"
-else
-  ARCH="$(arch)"
-fi
+ARCH="$(arch)"
+
+case $ARCH in
+
+  x86_64)
+    ARCH="amd64"
+    ;;
+
+  ppc64le)
+    ARCH="ppc64el"
+    ;;
+esac
 
 # Setup required sysctl params, these persist across reboots.
 cat > /etc/sysctl.d/99-kubernetes-cri.conf <<EOF
